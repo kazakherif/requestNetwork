@@ -1,0 +1,19 @@
+query getFlowEvents($timePaginator: BigInt! = "1639682073") {
+  flowUpdatedEvents(
+    first: 25
+    orderBy: timestamp
+    where: {timestamp_gt: $timePaginator, userData: "0xccdd062405cd833d"}
+  ) {
+    id
+    transactionHash
+    timestamp
+    token
+    sender
+    receiver
+    flowRate
+    oldFlowRate
+    type
+    totalAmountStreamedUntilTimestamp
+    userData
+  }
+}

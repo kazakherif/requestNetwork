@@ -25,7 +25,7 @@ export const getTheGraphClient = (
   //  which is a better security but would require an update of the
   //  library each time the subgraph is updated, which isn't ideal
   //  for early testing.
-  const url = `${baseUrl}/subgraphs/name/requestnetwork/request-payments-${network}`;
+  const url = `${baseUrl}/subgraphs/name/superfluid-finance/protocol-v1-${network}`;
   return getSdk(new GraphQLClient(url, options));
 };
 
