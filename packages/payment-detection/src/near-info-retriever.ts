@@ -1,6 +1,12 @@
 import { PaymentTypes } from '@requestnetwork/types';
+import { getTheGraphClient } from '.';
 
 const NEAR_WEB_SOCKET_URL = 'wss://near-explorer-wamp.onrender.com/ws';
+
+// FIXME#1: when Near subgraphes can retrieve a txHash, replace the custom IPaymentNetworkEvent with PaymentTypes.ETHPaymentNetworkEvent
+interface NearSubGraphPaymentEvent extends PaymentTypes.IETHPaymentEventParameters {
+  receiptId: string;
+}
 
 /**
  * Gets a list of transfer events for a set of Near payment details
@@ -27,20 +33,30 @@ export class NearInfoRetriever {
     this.nearWebSocketUrl = NEAR_WEB_SOCKET_URL;
   }
 
-  public async getTransferEvents(): Promise<PaymentTypes.ETHPaymentNetworkEvent[]> {
-    const events = await this.getTransactionsFromNearIndexerDatabase();
+  public async getTransferEvents(): Promise<
+    PaymentTypes.IPaymentNetworkEvent<NearSubGraphPaymentEvent>[]
+  > {
+    const events = await this.getTransactionsFromNearSubGraph();
     return events.map((transaction) => ({
       amount: transaction.deposit,
       name: this.eventName,
       parameters: {
         block: transaction.block,
         confirmations: transaction.confirmations,
-        txHash: transaction.txHash,
+        // Cf. FIXME above
+        // txHash: transaction.txHash,
+        receiptId: transaction.receiptId,
       },
       timestamp: Number(
         transaction.blockTimestamp.substring(0, transaction.blockTimestamp.length - 9),
       ),
     }));
+  }
+  private async getTransactionsFromNearSubGraph(): Promise<NearSubGraphTransaction[]> {
+    const client = getTheGraphClient(
+      this.network === 'aurora' ? 'aurora' : 'unknown-near-testnet-graph',
+    );
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -128,6 +144,19 @@ export class NearInfoRetriever {
 
 export type NearIndexerTransaction = {
   txHash: string;
+  block: number;
+  blockTimestamp: string;
+  confirmations: number;
+  payer: string;
+  payee: string;
+  deposit: string;
+  method_name: string;
+  to: string;
+  paymentReference: string;
+};
+
+type NearSubGraphTransaction = {
+  receiptId: string;
   block: number;
   blockTimestamp: string;
   confirmations: number;
