@@ -54,8 +54,7 @@ export interface ITimestampBoundaries {
   to?: number;
 }
 
-/** return interface for PersistTransaction  */
-export interface IReturnPersistTransaction extends EventEmitter {
+export type IReturnPersistTransactionRaw = {
   /** meta information */
   meta: {
     /** location of the persisted transaction */
@@ -67,7 +66,9 @@ export interface IReturnPersistTransaction extends EventEmitter {
   };
   /** result of the execution */
   result: Record<string, never>;
-}
+};
+
+export type IReturnPersistTransaction = EventEmitter & IReturnPersistTransactionRaw;
 
 /** return interface for getTransactionsByChannelId */
 export interface IReturnGetTransactions {
